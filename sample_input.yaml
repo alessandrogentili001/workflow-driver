@@ -1,0 +1,98 @@
+--- # Workflow driver input file
+
+# General flow control parameters
+Workflow:
+  CaseName: LRNOGV_XX_XX_XX
+  GeneralSetupScript: general_setup_script.sh
+  InitializationPhase:
+    SetupScript: init_setup_script.sh
+    SimulationScript: init_simu_script.sh
+    MaxDuration: 0.1
+  TransientPhase:
+    SimulationScript: transient_simu_script.sh
+    PostprocessingScript: transient_postpro_script.sh
+    MaxDuration: 0.1
+    StopCriterion:
+      - Name: OutletMassFlowVariation
+        Tolerance: 0.05
+        TimeWindow: 1e-3
+      - Name: InletMassFlowVariation
+        Tolerance: 0.05
+        TimeWindow: 1e-3
+      - Name: BalanceMassFlowVariation
+        Tolerance: 0.05
+        TimeWindow: 1e-3
+      - Name: KineticEnergyVariation
+        Tolerance: 0.05
+        TimeWindow: 1e-3
+      - Name: MSER
+        Quantity: PressureOnProbes
+        TransientUpperBound: 100
+  ProductionPhase:
+    SimulationScript: prod_simu_script.sh
+    PostprocessingScript: prod_postpro_script.sh
+    MaxDuration: 0.1
+    StopCriterion:
+      - Name: AverageReynoldsStressVariation
+        Tolerance: 0.05
+        TimeWindow: 1e-3
+      - Name: AverageSpanwiseVelocityVariation
+        Tolerance: 0.05
+        TimeWindow: 1e-3
+      - Name: TimeAverageDifference
+        Quantity: SolutionOnProbes
+        Tolerance: 0.05
+        BaseTimeWindow: 1e-3
+      - Name: ConfidenceIntervalBoxho
+        Quantity: SolutionOnProbes
+        ToleranceGEFFit: 0.05
+        Tolerance: 0.05
+      - Name: ConfidenceIntervalTrentBerth
+        Quantity: SolutionOnProbes
+        ConfidenceLevel: 0.95
+        Tolerance: 0.05
+        BaseTimeWindow: 1e-3
+
+# Geometrical and physical parameters
+PhysicalSetup:
+  Geometry:
+    CAD: cascade_geom.stp
+    PointList: cascade_geom.dat
+  FluidProperties:
+    Cp: 1004.675 
+    Gamma: 1.4
+    R: 287.05
+    Pr: 0.71
+    ConstantViscosity: 1.716e-5
+    SutherlandViscosityLaw:
+      ReferenceViscosity: 1.716e-5
+      ReferenceTemperature: 273.15
+      Coefficient: 110.4
+    ConstantConductivity: 0.0239459
+    SutherlandConductivityLaw:
+      ReferenceConductivity: 0.0239459
+      ReferenceTemperature: 273.15
+      Coefficient: 110.4
+  FlowConditions:
+    Inlet:
+      TotalPressure: 18416.
+      TotalTemperature: 292.6
+      Direction: [0.7313537016191706, 0.6819983600624985, 0.] # Vector
+    Outlet:
+      StaticPressure: 16400.
+
+# Output parameters
+Output:
+  ProbeSets:
+    - Name: ProbeSet1
+      CoordinateFile: probe_set_1.dat
+  Outputs:
+    - Quantity: [SolutionOnProbes, PressureOnProbes, VelocityOnProbes, TemperatureOnProbes, SolutionVolumeField, PressureVolumeField, VelocityVolumeField, TemperatureVolumeField, TKEVolumeField, TKEDissipationVolumeField, ReynoldsStressVolumeField, VelocityGradientVolumeField, VorticityVolumeField, KineticEnergyVolumeField, FlowAngleVolumeField, EntropyVolumeField, PressureSurfaceField, WallShearStressSurfaceField, VelocityCorrelationOnProbePlane, VorticityVolumeInSitu, QCriterionVolumeInSitu, PressureSurfaceInSitu, WallShearStressSurfaceInSitu]
+      Averaging: Instantaneous # Instantaneous, TimeAverage, FavreAverage, BasedOnTimeAveragedSolution, BasedOnFavreAveragedSolution
+      ProbeSets: [ProbeSet1, ProbeSet2]
+      VolumeID: [VolumeID1, VolumeID2]
+      SurfaceID: [SurfaceID1, SurfaceID2]
+      TimeInterval: 1e-4
+#      History: Yes  # Yes, No
+      Phase: [Initialization, Transient, Production]
+
