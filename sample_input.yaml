@@ -8,6 +8,10 @@ Workflow:
     SetupScript: init_setup_script.sh
     SimulationScript: init_simu_script.sh
     MaxDuration: 0.1
+    HPC:
+      NumberOfNodes: 1
+      NumberOfTasks: 1
+      NumberOfGPUs: 1
   TransientPhase:
     SimulationScript: transient_simu_script.sh
     PostprocessingScript: transient_postpro_script.sh
@@ -29,6 +33,10 @@ Workflow:
         Quantity: PressureOnProbes
         TransientUpperBound: 100
         ProbeSets: [ProbeSet1, ProbeSet2]
+    HPC:
+      NumberOfNodes: 1
+      NumberOfTasks: 1
+      NumberOfGPUs: 1
   ProductionPhase:
     SimulationScript: prod_simu_script.sh
     PostprocessingScript: prod_postpro_script.sh
@@ -58,6 +66,10 @@ Workflow:
         Tolerance: 0.05
         BaseTimeWindow: 1e-3
         ProbeSets: [ProbeSet1, ProbeSet2]
+    HPC:
+      NumberOfNodes: 1
+      NumberOfTasks: 1
+      NumberOfGPUs: 1
 
 # Geometrical and physical parameters
 PhysicalSetup:
