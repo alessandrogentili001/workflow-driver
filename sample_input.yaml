@@ -86,6 +86,10 @@ PhysicalSetup:
       Direction: [0.7313537016191706, 0.6819983600624985, 0.] # Vector
     Outlet:
       StaticPressure: 16400.
+  # BoundaryConditionController:  # Possible controller parameters to be completed
+  #   Type: null
+  # AVDRCorrection:               # Possible AVDR correction parameters to be completed
+  #   Type: null
 
 # Output parameters
 Output:
