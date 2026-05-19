@@ -28,6 +28,7 @@ Workflow:
       - Name: MSER
         Quantity: PressureOnProbes
         TransientUpperBound: 100
+        ProbeSets: [ProbeSet1, ProbeSet2]
   ProductionPhase:
     SimulationScript: prod_simu_script.sh
     PostprocessingScript: prod_postpro_script.sh
@@ -36,22 +37,27 @@ Workflow:
       - Name: AverageReynoldsStressVariation
         Tolerance: 0.05
         TimeWindow: 1e-3
+        ProbeSets: [ProbeSet1, ProbeSet2]
       - Name: AverageSpanwiseVelocityVariation
         Tolerance: 0.05
         TimeWindow: 1e-3
+        ProbeSets: [ProbeSet1, ProbeSet2]
       - Name: TimeAverageDifference
         Quantity: SolutionOnProbes
         Tolerance: 0.05
         BaseTimeWindow: 1e-3
+        ProbeSets: [ProbeSet1, ProbeSet2]
       - Name: ConfidenceIntervalBoxho
         Quantity: SolutionOnProbes
         ToleranceGEFFit: 0.05
         Tolerance: 0.05
+        ProbeSets: [ProbeSet1, ProbeSet2]
       - Name: ConfidenceIntervalTrentBerth
         Quantity: SolutionOnProbes
         ConfidenceLevel: 0.95
         Tolerance: 0.05
         BaseTimeWindow: 1e-3
+        ProbeSets: [ProbeSet1, ProbeSet2]
 
 # Geometrical and physical parameters
 PhysicalSetup:
