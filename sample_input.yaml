@@ -12,6 +12,7 @@ Workflow:
       NumberOfNodes: 1
       NumberOfTasks: 1
       NumberOfGPUs: 1
+    FinalSignalFileName: INITIALIZATION_PHASE_FINALIZED
   TransientPhase:
     SimulationScript: transient_simu_script.sh
     PostprocessingScript: transient_postpro_script.sh
@@ -37,6 +38,7 @@ Workflow:
       NumberOfNodes: 1
       NumberOfTasks: 1
       NumberOfGPUs: 1
+    FinalSignalFileName: TRANSIENT_PHASE_FINALIZED
   ProductionPhase:
     SimulationScript: prod_simu_script.sh
     PostprocessingScript: prod_postpro_script.sh
@@ -70,6 +72,7 @@ Workflow:
       NumberOfNodes: 1
       NumberOfTasks: 1
       NumberOfGPUs: 1
+    FinalSignalFileName: PRODUCTION_PHASE_FINALIZED
 
 # Geometrical and physical parameters
 PhysicalSetup:
