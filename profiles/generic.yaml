@@ -30,10 +30,10 @@ cluster-generic-cancel-cmd: "scripts/cluster_generic_cancel.sh"
 
 # how to reach the files in the rmeote cluster 
 default-storage-provider: sftp
-default-storage-prefix: "sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/openfoam-cavity-workflow/"
+default-storage-prefix: "sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/workflow-driver/"
 
 # Provide your exact CINECA username profile details
 storage-sftp-username: "agentil1"
 
 config:
-  remote_workdir: "/leonardo_work/PHD_gentili/openfoam-cavity-workflow"
+  remote_workdir: "/leonardo_work/PHD_gentili/workflow-driver"

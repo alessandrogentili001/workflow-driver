@@ -16,12 +16,12 @@ This repository is carefully organized to cleanly separate the workflow orchestr
 - `scripts/`: Helper bash scripts for cluster submission and status checking (required only for local orchestration), along with centralized configurations (`cluster_config.sh`) to virtualize paths between WSL and HPC.
 - `cavity/`: The actual OpenFOAM case directory containing `0`, `constant`, and `system` configurations.
 - `makefile`: Provides convenient commands for running and cleaning the workflow.
-- `environment.yaml`: Conda environment specification containing all required dependencies.
+- `requirements.txt`:Txt specification containing all required dependencies.
 
 ```text
 .
 ├── .env
-├── environment.yaml
+├── requirements.txt
 ├── makefile
 ├── README.md
 ├── cavity/
