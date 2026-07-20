@@ -41,4 +41,4 @@ slurm-jobname-prefix: "cavity_wf"
 slurm-efficiency-report: true
 
 config:
-  remote_workdir: "/leonardo_work/PHD_gentili/openfoam-cavity-workflow"
+  remote_workdir: "/leonardo_work/PHD_gentili/workflow-driver"

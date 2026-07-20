@@ -4,8 +4,8 @@
 # Update these paths to match your local and remote environments.
 
 # working dir
-export LOCAL_WORKDIR="/mnt/c/Users/a.gentili/Downloads/openfoam-cavity-workflow"
-export REMOTE_WORKDIR="/leonardo_work/PHD_gentili/openfoam-cavity-workflow"
+export LOCAL_WORKDIR="/mnt/c/Users/a.gentili/Downloads/workflow-driver"
+export REMOTE_WORKDIR="/leonardo_work/PHD_gentili/workflow-driver"
 
 # environment dir 
 export LOCAL_VENV="${LOCAL_WORKDIR}/venv"
