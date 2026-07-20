@@ -1,0 +1,85 @@
+host: CIN-PF1M04BM
+Building DAG of jobs...
+Using shell: /usr/bin/bash
+Provided remote nodes: 1
+Job stats:
+job                    count
+-------------------  -------
+run_simulation             1
+finalize_simulation        1
+all                        1
+total                      3
+
+Select jobs to execute...
+Execute 1 jobs...
+[Mon Jul 20 10:53:40 2026]
+checkpoint run_simulation:
+    input: sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/openfoam-cavity-workflow/cavity/log.decomposePar (retrieve from storage)
+    output: sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/openfoam-cavity-workflow/cavity/logs/simulation_run_1.log (send to storage)
+    jobid: 2
+    reason: Missing output files: sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/openfoam-cavity-workflow/cavity/logs/simulation_run_1.log (in storage)
+    wildcards: i=1
+    resources: tmpdir=<TBD>, disk_mb=1000, disk=1 GB, disk_mib=954, mem_mb=256000, mem=256 GB, mem_mib=244141, slurm_account=phd_gentili_0, slurm_partition=dcgp_usr_prod, runtime=10, ntasks_per_node=8, cpus_per_task=4
+DAG of jobs will be updated after completion.
+Submitted job 2 with external jobid '49878712'.
+[Mon Jul 20 10:54:18 2026]
+Finished jobid: 2 (Rule: run_simulation)
+1 of 3 steps (33%) done
+Updating checkpoint dependencies.
+Select jobs to execute...
+Execute 1 jobs...
+[Mon Jul 20 10:55:17 2026]
+checkpoint run_simulation:
+    input: sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/openfoam-cavity-workflow/cavity/log.decomposePar (retrieve from storage)
+    output: sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/openfoam-cavity-workflow/cavity/logs/simulation_run_2.log (send to storage)
+    jobid: 7
+    reason: Missing output files: sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/openfoam-cavity-workflow/cavity/logs/simulation_run_2.log (in storage)
+    wildcards: i=2
+    resources: tmpdir=<TBD>, disk_mb=1000, disk=1 GB, disk_mib=954, mem_mb=256000, mem=256 GB, mem_mib=244141, slurm_account=phd_gentili_0, slurm_partition=dcgp_usr_prod, runtime=10, ntasks_per_node=8, cpus_per_task=4
+DAG of jobs will be updated after completion.
+Submitted job 7 with external jobid '49878832'.
+[Mon Jul 20 10:55:58 2026]
+Finished jobid: 7 (Rule: run_simulation)
+2 of 4 steps (50%) done
+Updating checkpoint dependencies.
+Select jobs to execute...
+Execute 1 jobs...
+[Mon Jul 20 10:57:02 2026]
+checkpoint run_simulation:
+    input: sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/openfoam-cavity-workflow/cavity/log.decomposePar (retrieve from storage)
+    output: sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/openfoam-cavity-workflow/cavity/logs/simulation_run_3.log (send to storage)
+    jobid: 10
+    reason: Missing output files: sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/openfoam-cavity-workflow/cavity/logs/simulation_run_3.log (in storage)
+    wildcards: i=3
+    resources: tmpdir=<TBD>, disk_mb=1000, disk=1 GB, disk_mib=954, mem_mb=256000, mem=256 GB, mem_mib=244141, slurm_account=phd_gentili_0, slurm_partition=dcgp_usr_prod, runtime=10, ntasks_per_node=8, cpus_per_task=4
+DAG of jobs will be updated after completion.
+Submitted job 10 with external jobid '49878862'.
+[Mon Jul 20 10:57:37 2026]
+Finished jobid: 10 (Rule: run_simulation)
+3 of 5 steps (60%) done
+Updating checkpoint dependencies.
+Select jobs to execute...
+Execute 1 jobs...
+[Mon Jul 20 10:58:04 2026]
+rule finalize_simulation:
+    input: sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/openfoam-cavity-workflow/cavity/logs/simulation_run_3.log (retrieve from storage)
+    output: sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/openfoam-cavity-workflow/cavity/simulation_done.txt (send to storage)
+    jobid: 1
+    reason: Missing output files: sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/openfoam-cavity-workflow/cavity/simulation_done.txt (in storage)
+    resources: tmpdir=<TBD>, disk_mb=1000, disk=1 GB, disk_mib=954, mem_mb=256000, mem=256 GB, mem_mib=244141, slurm_account=phd_gentili_0, slurm_partition=dcgp_usr_prod, runtime=10, ntasks_per_node=8, cpus_per_task=4
+Submitted job 1 with external jobid '49878884'.
+[Mon Jul 20 10:58:36 2026]
+Finished jobid: 1 (Rule: finalize_simulation)
+4 of 5 steps (80%) done
+Select jobs to execute...
+Execute 1 jobs...
+[Mon Jul 20 10:58:41 2026]
+localrule all:
+    input: sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/openfoam-cavity-workflow/cavity/simulation_done.txt (retrieve from storage)
+    jobid: 0
+    reason: Input files updated by another job: sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/openfoam-cavity-workflow/cavity/simulation_done.txt (in storage)
+    resources: tmpdir=/tmp, disk_mb=1000, disk=1 GB, disk_mib=954, mem_mb=256000, mem=256 GB, mem_mib=244141, slurm_account=phd_gentili_0, slurm_partition=dcgp_usr_prod, runtime=10, ntasks_per_node=8, cpus_per_task=4
+[Mon Jul 20 10:58:42 2026]
+Finished jobid: 0 (Rule: all)
+5 of 5 steps (100%) done
+Complete log(s): /mnt/c/Users/a.gentili/Downloads/openfoam-cavity-workflow/.snakemake/log/2026-07-20T105325.871367.snakemake.log

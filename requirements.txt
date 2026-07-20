@@ -1,0 +1,11 @@
+# Snakemake 
+snakemake
+snakemake-executor-plugin-slurm
+snakemake-executor-plugin-cluster-generic
+jinja2
+matplotlib
+graphviz
+pygments
+
+# Custom plugin 
+snakemake-storage-plugin-sftp @ git+https://gitlab.hpc.cineca.it/agentil1/snakemake-storage-plugin-sftp.git

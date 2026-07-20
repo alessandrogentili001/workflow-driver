@@ -1,0 +1,21 @@
+
+SNAKEMAKE
+=========
+  Date: 2026-07-20 11:47:22
+  Workflow ID: 69848264-49c4-4fee-8774-9db3cd6c5a1e
+  Platform: Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39
+  Host: CIN-PF1M04BM
+  User: agentili
+  Snakemake version: 9.23.1
+  Python version: 3.14.6 | packaged by conda-forge | (main, Jun 12 2026, 08:51:42) [GCC 14.3.0]
+  Command: /home/agentili/.pixi/envs/conda/envs/workflow-driver-env/bin/snakemake --profile profiles/generic.yaml --rerun-incomplete
+  Snakefile: /mnt/c/Users/a.gentili/Downloads/openfoam-cavity-workflow/workflow/cavity_workflow.smk
+  Base directory: /mnt/c/Users/a.gentili/Downloads/openfoam-cavity-workflow/workflow
+  Run directory: /mnt/c/Users/a.gentili/Downloads/openfoam-cavity-workflow
+  Working directory: /mnt/c/Users/a.gentili/Downloads/openfoam-cavity-workflow
+  Config file(s): []
+  Config MD5: 4d975444b5756bd683733888f8a76259
+
+Building DAG of jobs...
+Updating checkpoint dependencies.
+Nothing to be done (all requested files are present and up to date).

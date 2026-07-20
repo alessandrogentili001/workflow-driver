@@ -1,0 +1,3 @@
+NameError in file "/mnt/c/Users/a.gentili/Downloads/openfoam-cavity-workflow/workflow/cavity_workflow.smk", line 44:
+name 'check_simulation' is not defined
+  File "/mnt/c/Users/a.gentili/Downloads/openfoam-cavity-workflow/workflow/cavity_workflow.smk", line 44, in <module>
