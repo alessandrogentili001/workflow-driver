@@ -80,6 +80,7 @@ def check_simulation(wildcards):
         # Smart check: If the file exists natively, we are evaluating on the cluster. 
         # If not, we are orchestrating from WSL and must use SSH.
         remote_log = f"{config['remote_workdir']}/cavity/logs/simulation_run_{i}.log"
+        remote_host = config['remote_host']
         try:
             import os
             if os.path.exists(remote_log):
@@ -87,7 +88,7 @@ def check_simulation(wildcards):
                     content = f.read()
             else:
                 content = subprocess.check_output(
-                    ["ssh", "-o", "BatchMode=yes", "leonardo", f"cat {remote_log}"],
+                    ["ssh", "-o", "BatchMode=yes", remote_host, f"cat {remote_log}"],
                     text=True
                 )
         except subprocess.CalledProcessError:
@@ -117,7 +118,10 @@ def check_simulation(wildcards):
                 if os.path.exists(remote_log):
                     subprocess.run(update_cmd, shell=True, executable='/bin/bash', check=True)
                 else:
-                    subprocess.run(["ssh", "-o", "BatchMode=yes", "leonardo", update_cmd], check=True, capture_output=True)
+                    result = subprocess.run(
+                        ["ssh", "-o", "BatchMode=yes", remote_host, update_cmd],
+                        capture_output=True, text=True,
+                    )
                 
             # Prepare to run next iteration
             i += 1
