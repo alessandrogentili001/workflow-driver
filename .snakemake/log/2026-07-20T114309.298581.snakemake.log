@@ -1,4 +1,0 @@
-SSHException in file "/mnt/c/Users/a.gentili/Downloads/openfoam-cavity-workflow/workflow/cavity_workflow.smk", line 12:
-No authentication methods available
-  File "/home/agentili/.pixi/envs/conda/envs/workflow-driver-env/lib/python3.14/site-packages/paramiko/client.py", line 485, in connect
-  File "/home/agentili/.pixi/envs/conda/envs/workflow-driver-env/lib/python3.14/site-packages/paramiko/client.py", line 819, in _auth
