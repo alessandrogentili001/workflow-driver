@@ -20,7 +20,7 @@ setup:
 	@echo "Virtual environment created! Please run 'source venv/bin/activate' before running other make targets."
 
 dry-run:
-	$(SNAKEMAKE) --profile $(PROFILE) --dry-run 
+	$(SNAKEMAKE) --profile $(PROFILE) --dry-run
 
 dag:
 	$(SNAKEMAKE) --profile $(PROFILE) --dag | dot -Tsvg > dag.svg
@@ -32,4 +32,3 @@ clean:
 	@rm -rf cavity/logs/* cavity/simulation_done.txt .snakemake/* efficiency_report* cavity/processor*
 	@bash cavity/clean
 	@foamDictionary cavity/system/controlDict -entry endTime -set 0.001
-	

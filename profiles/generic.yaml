@@ -11,7 +11,7 @@ shared-fs-usage: none
 # groups:
 #   pre_processing: 1
 #   core_analysis: 1
-#   loop: 1 
+#   loop: 1
 
 # Default resources
 default-resources:
@@ -28,7 +28,7 @@ cluster-generic-submit-cmd: "scripts/cluster_generic_submit.sh"
 cluster-generic-status-cmd: "scripts/cluster_generic_status.sh"
 cluster-generic-cancel-cmd: "scripts/cluster_generic_cancel.sh"
 
-# how to reach the files in the rmeote cluster 
+# how to reach the files in the rmeote cluster
 default-storage-provider: sftp
 default-storage-prefix: "sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/workflow-driver/"
 

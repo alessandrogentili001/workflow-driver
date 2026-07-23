@@ -60,7 +60,7 @@ Repeat the following steps both for the local and HPC environments:
    ```
 2. Create the virtual environment and install dependencies:
    ```bash
-   python3 -m venv venv 
+   python3 -m venv venv
    source venv/bin/activate
    pip install -r requirements.txt
    ```
@@ -110,7 +110,7 @@ For common tasks, use the provided `makefile`:
 make help
 
 # Visualize the dag as png image
-make dag 
+make dag
 
 # Run dry-run to preview the workflow steps (useful before submitting)
 make dry-run
@@ -137,7 +137,7 @@ PY
 ```
 
 ## Understanding Snakemake and DAGs
-This project relies heavily on Snakemake to manage task dependencies via Directed Acyclic Graphs (DAGs). Snakemake determines what needs to be run by building a graph of inputs and outputs. 
+This project relies heavily on Snakemake to manage task dependencies via Directed Acyclic Graphs (DAGs). Snakemake determines what needs to be run by building a graph of inputs and outputs.
 
 To understand how we create DAGs, define rules, and run workflows, please refer to the [official Snakemake repository](https://github.com/snakemake/snakemake) and its [official documentation](https://snakemake.readthedocs.io/). In particular, we suggest starting with the provided [tutorial](https://snakemake.readthedocs.io/en/stable/tutorial/basics.html).
 

@@ -70,14 +70,14 @@ TARGET_SIMULATION_TIME = 0.003
 def check_simulation(wildcards):
     import re
     import subprocess
-    
+
     i = 1
     while True:
         # get() will trigger the checkpoint to run if it hasn't already
         # We don't use .output[0] because the file isn't downloaded locally
         checkpoints.run_simulation.get(i=i)
-        
-        # Smart check: If the file exists natively, we are evaluating on the cluster. 
+
+        # Smart check: If the file exists natively, we are evaluating on the cluster.
         # If not, we are orchestrating from WSL and must use SSH.
         remote_log = f"{config['remote_workdir']}/cavity/logs/simulation_run_{i}.log"
         remote_host = config['remote_host']
@@ -94,7 +94,7 @@ def check_simulation(wildcards):
         except subprocess.CalledProcessError:
             raise ValueError(f"Failed to read simulation log on cluster: {remote_log}")
 
-        # Check if the simulation timestep is reached 
+        # Check if the simulation timestep is reached
         times = re.findall(r'^Time = ([\d\.]+)', content, re.MULTILINE)
         if times:
             latest_time = float(times[-1])
@@ -107,14 +107,14 @@ def check_simulation(wildcards):
                 new_end_time = round(latest_time + 0.001, 4)
                 if new_end_time > TARGET_SIMULATION_TIME:
                     new_end_time = TARGET_SIMULATION_TIME
-                
+
                 # Update controlDict directly ON THE CLUSTER
                 update_cmd = (
                     f"cd {config['remote_workdir']} && "
                     "source .env && "
                     f"foamDictionary cavity/system/controlDict -entry endTime -set {new_end_time}"
                 )
-                
+
                 if os.path.exists(remote_log):
                     subprocess.run(update_cmd, shell=True, executable='/bin/bash', check=True)
                 else:
@@ -122,7 +122,7 @@ def check_simulation(wildcards):
                         ["ssh", "-o", "BatchMode=yes", remote_host, update_cmd],
                         capture_output=True, text=True,
                     )
-                
+
             # Prepare to run next iteration
             i += 1
         else:

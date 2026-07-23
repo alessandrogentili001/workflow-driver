@@ -5,11 +5,11 @@ snakefile: workflow/cavity_workflow.smk
 executor: slurm
 jobs: 1 # jobs to run in parallel, check the single job resources and compare them to the default ones (upper bound)
 
-# --group flag 
+# --group flag
 groups:
   pre_processing: 1 # increaase to pack together more rules, reducing scheduler overhead, also reducing parallelism
   core_analysis: 1
-  loop: 1 # change the snakefile and turn the related rules localrules 
+  loop: 1 # change the snakefile and turn the related rules localrules
 
 # Default resources (The "Booster" Defaults)
 default-resources:
@@ -17,17 +17,17 @@ default-resources:
   slurm_partition: "dcgp_usr_prod"
   runtime: 1440
   #nodes: 1
-  ntasks_per_node: 8   # need to play more with  
-  cpus_per_task: 4     # this two flags 
+  ntasks_per_node: 8   # need to play more with
+  cpus_per_task: 4     # this two flags
   mem: "256G"
   # Standardized GPU request
-  #gpu: 4 # remove if you are not using them in any rule 
+  #gpu: 4 # remove if you are not using them in any rule
 
 # Slurm Plugin Specific Settings
 slurm-pass-command-as-script: true
 
 # slurm log management
-#slurm-logdir: "cavity/logs/slurm" # all the outputs obtained from a slurm job are stored inside here 
+#slurm-logdir: "cavity/logs/slurm" # all the outputs obtained from a slurm job are stored inside here
 slurm-keep-successful-logs: true
 
 slurm-init-seconds-before-status-checks: 10
@@ -35,7 +35,7 @@ seconds-between-status-checks: 30
 slurm-status-attempts: 5
 
 slurm-jobname-prefix: "cavity_wf"
-# slurm-status-command: "squeue" # keep the default one 
+# slurm-status-command: "squeue" # keep the default one
 
 # efficiency reporting
 slurm-efficiency-report: true

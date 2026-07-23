@@ -20,7 +20,7 @@ Because the local machine (WSL) and the cluster (Leonardo) do not share the same
 This script is used by Snakemake to periodically check the status of a submitted job.
 
 - **Robust SSH Handling**: It includes a custom `ssh_run` wrapper function that implements exponential backoff. This ensures that if the SSH connection temporarily drops (returning exit code 255), Snakemake will retry instead of instantly assuming the job failed and crashing the workflow.
-- **Two-Tier State Checking**: 
+- **Two-Tier State Checking**:
   1. It first queries `squeue` to see if the job is actively running or pending.
   2. If the job is no longer in `squeue` (because it finished), it falls back to querying `sacct` for historical state data.
 - It returns standard states (`success`, `running`, `failed`) expected by Snakemake.
