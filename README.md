@@ -55,8 +55,8 @@ Repeat the following steps both for the local and HPC environments:
 
 1. Clone the repository
    ```bash
-   git clone <your-repo-url>
-   cd openfoam-cavity-workflow
+   git clone https://gitlab.hpc.cineca.it/agentil1/workflow-driver.git
+   cd workflow-driver
    ```
 2. Create the virtual environment and install dependencies:
    ```bash
