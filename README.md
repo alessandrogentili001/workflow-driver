@@ -125,7 +125,15 @@ When using Snakemake's SFTP plugin with SSH certificates (like those generated b
 
 To fix this, patch the `paramiko` library directly inside your virtual environment:
 ```bash
-python -c "import paramiko.agent; file_path = paramiko.agent.__file__; code = open(file_path).read(); code = code.replace('def __getattr__(self, name):', 'def __getattr__(self, name):\n        if name == \'public_blob\': return None'); open(file_path, 'w').write(code); print('Patched paramiko successfully')"
+python3 -c <<PY
+import paramiko.agent
+file_path = paramiko.agent.__file__
+code = open(file_path).read()
+code = code.replace('def __getattr__(self, name):', \\
+    'def __getattr__(self, name):\\n        if name == \\'public_blob\\': return None')
+open(file_path, 'w').write(code)
+print('Patched paramiko successfully')
+PY
 ```
 
 ## Understanding Snakemake and DAGs
