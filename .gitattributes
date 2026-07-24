@@ -6,6 +6,7 @@
 cavity/pre text eol=lf
 cavity/dec text eol=lf
 cavity/run text eol=lf
+cavity/clean text eol=lf
 
 # Enforce LF for Snakemake workflows and YAML profiles
 *.smk text eol=lf
