@@ -1,0 +1,19 @@
+# Set default behavior: auto-detect text files and normalize to LF
+* text=auto eol=lf
+
+# Explicitly enforce LF line endings for all shell scripts and OpenFOAM scripts
+*.sh text eol=lf
+cavity/pre text eol=lf
+cavity/dec text eol=lf
+cavity/run text eol=lf
+
+# Enforce LF for Snakemake workflows and YAML profiles
+*.smk text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+Dockerfile text eol=lf
+
+# Keep binary files as-is
+*.png binary
+*.jpg binary
+*.tar.gz binary
