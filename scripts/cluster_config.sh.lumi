@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# This configuration file centralizes all paths and variables required for the cluster submission.
+# Update these paths to match your local and remote environments.
+
+# working dir
+export LOCAL_WORKDIR="/home/tommaso/workflow-driver"
+export REMOTE_WORKDIR="/scratch/project_465002347/tommaso/workflow-driver"
+
+# environment dir
+export LOCAL_VENV="${LOCAL_WORKDIR}/venv"
+export REMOTE_VENV="${REMOTE_WORKDIR}/venv"
+
+# cache dir
+export LOCAL_CACHE="${LOCAL_WORKDIR}/.cache"
+export REMOTE_CACHE="${REMOTE_WORKDIR}/.cache"
+
+# host name
+export REMOTE_HOST="lumi"
+export REMOTE_STORAGE_HOST="lumi.csc.fi:22"

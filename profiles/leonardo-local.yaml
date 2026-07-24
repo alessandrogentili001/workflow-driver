@@ -16,10 +16,10 @@ default-resources:
   slurm_account: "phd_gentili_0"
   slurm_partition: "dcgp_usr_prod"
   runtime: 1440
-  #nodes: 1
-  ntasks_per_node: 8   # need to play more with
-  cpus_per_task: 4     # this two flags
-  mem: "256G"
+  nodes: 1
+  tasks: 8
+  cpus_per_task: 1
+  mem: "16G"
   # Standardized GPU request
   #gpu: 4 # remove if you are not using them in any rule
 
@@ -42,3 +42,4 @@ slurm-efficiency-report: true
 
 config:
   remote_workdir: "/leonardo_work/PHD_gentili/workflow-driver"
+  remote_host: "leonardo"

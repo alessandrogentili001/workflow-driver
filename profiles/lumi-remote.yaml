@@ -15,12 +15,12 @@ shared-fs-usage: none
 
 # Default resources
 default-resources:
-  slurm_account: "phd_gentili_0"
-  slurm_partition: "dcgp_usr_prod"
-  runtime: 10
+  slurm_account: "project_465002347"
+  slurm_partition: "small"
+  runtime: 1440
   ntasks_per_node: 8
-  cpus_per_task: 4
-  mem: "256G"
+  cpus_per_task: 1
+  mem: "16G"
 
 # We use local helper scripts to wrap SSH/SCP complexity.
 # The Snakemake 8 plugin automatically appends arguments at the end, so no placeholders are needed!
@@ -30,10 +30,14 @@ cluster-generic-cancel-cmd: "scripts/cluster_generic_cancel.sh"
 
 # how to reach the files in the rmeote cluster
 default-storage-provider: sftp
-default-storage-prefix: "sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/workflow-driver/"
+default-storage-prefix: "sftp://lumi.csc.fi:22/scratch/project_465002347/tommaso/workflow-driver"
 
 # Provide your exact CINECA username profile details
-storage-sftp-username: "agentil1"
+storage-sftp-username: "zanellit"
+
+# Paramiko does not read ~/.ssh/config, so point it directly at the LUMI key
+storage-sftp-key-file: "/home/tommaso/.ssh/id_ed25519_lumi_2"
 
 config:
-  remote_workdir: "/leonardo_work/PHD_gentili/workflow-driver"
+  remote_workdir: "/scratch/project_465002347/tommaso/workflow-driver"
+  remote_host: "lumi"
