@@ -1,5 +1,4 @@
 #!/bin/bash
 cd "${0%/*}" || exit
-. ${WM_PROJECT_DIR:?}/bin/tools/CleanFunctions
 
-cleanCase
+rm -rf log.* 0.* constant/polyMesh processor* ./[1-9]*

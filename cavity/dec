@@ -1,5 +1,4 @@
 #!/bin/bash
 cd "${0%/*}" || exit
-. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
 
-runApplication decomposePar
+srun -n 1 decomposePar &> log.decomposePar

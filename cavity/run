@@ -1,5 +1,4 @@
 #!/bin/bash
 cd "${0%/*}" || exit
-. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions
 
-runParallel icoFoam
+srun -n ${SLURM_NTASKS} icoFoam -parallel &> log.icoFoam
