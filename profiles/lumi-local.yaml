@@ -15,6 +15,7 @@ default-resources:
   ntasks_per_node: 8
   cpus_per_task: 1
   mem: "16G"
+  mpi: "srun"
 
 # Slurm Plugin Specific Settings
 slurm-pass-command-as-script: true

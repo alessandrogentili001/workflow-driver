@@ -1,4 +1,4 @@
 #!/bin/bash
 cd "${0%/*}" || exit
 
-srun -n ${SLURM_NTASKS} icoFoam -parallel &> log.icoFoam
+srun -n "${SLURM_NTASKS:-8}" icoFoam -parallel &> log.icoFoam
