@@ -15,6 +15,7 @@ default-resources:
   ntasks_per_node: 8
   cpus_per_task: 1
   mem: "16G"
+  mpi: "srun"
   # Standardized GPU request
   #gpu: 4 # remove if you are not using them in any rule
 
