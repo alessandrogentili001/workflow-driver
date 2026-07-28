@@ -37,9 +37,9 @@ This repository is carefully organized to cleanly separate the workflow orchestr
 │   └── lumi-remote.yaml
 ├── scripts/
 │   ├── cluster_config.sh
-│   ├── cluster_generic_cancel.sh
-│   ├── cluster_generic_status.sh
-│   └── cluster_generic_submit.sh
+│   ├── remote_cancel.sh
+│   ├── remote_status.sh
+│   └── remote_submit.sh
 └── workflow/
     └── cavity_workflow.smk
 ```
@@ -121,8 +121,8 @@ When orchestrating from your local WSL machine, we employ a "Split-Brain" archit
 
 **How it works**:
 - **Storage Syncing**: `snakemake-storage-plugin-sftp` automatically pushes inputs and pulls outputs between the local machine and the remote HPC cluster filesystem.
-- **Job Submission**: The `cluster-generic` executor passes a generated jobscript to `scripts/cluster_generic_submit.sh`, which virtualizes paths and submits to Slurm via an SSH `sbatch` command.
-- **Log Synchronization**: Whenever a job finishes (successfully or failed), the `cluster_generic_status.sh` script automatically uses `scp` to pull the latest `cavity/logs/` directory back to your local machine.
+- **Job Submission**: The `cluster-generic` executor passes a generated jobscript to `scripts/remote_submit.sh`, which virtualizes paths and submits to Slurm via an SSH `sbatch` command.
+- **Log Synchronization**: Whenever a job finishes (successfully or failed), the `remote_status.sh` script automatically uses `scp` to pull the latest `cavity/logs/` directory back to your local machine.
 - **Dynamic Checkpoints**: The workflow loops based on simulation times. When evaluating from WSL, the Python checkpoint function dynamically uses `ssh` to read the log remotely and execute `foamDictionary` directly on the cluster.
 
 **To Run (Leonardo)**:
@@ -190,4 +190,4 @@ Because the cavity simulation is just a placeholder, you are fully empowered to 
 - **Swap the case directory**: Replace the `cavity/` folder with your own target simulation.
 - **Update the Snakefile**: Edit `workflow/cavity_workflow.smk` to rename paths, change bash commands, or adjust the looping conditions in the checkpoint function.
 - **Adjust Resources**: Modify the Snakemake rules to request different hardware (nodes, CPUs, GPUs, etc.) and update `profiles/generic.yaml` or `profiles/leonardo.yaml` as needed.
-- **Update Synchronization Paths**: If your case folder is named differently (e.g., `motorBike/`), ensure you update the hardcoded folder references in the bash helper scripts (`scripts/cluster_generic_submit.sh` and `scripts/cluster_generic_status.sh`), specifically regarding the `logs/` directory synchronization.
+- **Update Synchronization Paths**: If your case folder is named differently (e.g., `motorBike/`), ensure you update the hardcoded folder references in the bash helper scripts (`scripts/remote_submit.sh` and `scripts/remote_status.sh`), specifically regarding the `logs/` directory synchronization.

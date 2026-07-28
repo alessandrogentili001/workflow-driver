@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This configuration file centralizes all paths and variables required for the cluster submission.
+# This configuration file centralizes all paths and variables required for the remote cluster submission.
 # Update these paths to match your local and remote environments.
 
 # working dir

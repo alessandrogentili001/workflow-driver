@@ -13,11 +13,11 @@ rule all:
     input:
         "cavity/simulation_done.txt"
 
-rule mesh_preparation:
+rule prepare_mesh:
     output:
         "cavity/log.blockMesh"
     log:
-        "cavity/logs/mesh_preparation.log"
+        "cavity/logs/prepare_mesh.log"
     shell:
         """
         # Run the pre script

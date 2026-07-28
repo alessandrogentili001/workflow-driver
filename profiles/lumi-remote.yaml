@@ -18,15 +18,15 @@ default-resources:
 
 # We use local helper scripts to wrap SSH/SCP complexity.
 # The Snakemake 8 plugin automatically appends arguments at the end, so no placeholders are needed!
-cluster-generic-submit-cmd: "scripts/cluster_generic_submit.sh"
-cluster-generic-status-cmd: "scripts/cluster_generic_status.sh"
-cluster-generic-cancel-cmd: "scripts/cluster_generic_cancel.sh"
+cluster-generic-submit-cmd: "scripts/remote_submit.sh" # submit a job
+cluster-generic-status-cmd: "scripts/remote_status.sh" # check a job status
+cluster-generic-cancel-cmd: "scripts/remote_cancel.sh" # cancel a job
 
-# how to reach the files in the rmeote cluster
+# how to reach the files in the remote cluster
 default-storage-provider: sftp
 default-storage-prefix: "sftp://lumi.csc.fi:22/scratch/project_465002347/tommaso/workflow-driver"
 
-# Provide your exact CINECA username profile details
+# Provide your exact HPC username profile details
 storage-sftp-username: "zanellit"
 
 # Paramiko does not read ~/.ssh/config, so point it directly at the LUMI key
