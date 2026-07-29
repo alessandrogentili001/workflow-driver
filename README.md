@@ -58,7 +58,6 @@ This repository is carefully organized to cleanly separate the workflow orchestr
   Host leonardo
       HostName login.leonardo.cineca.it
       User <your-hpc-username>
-      IdentityFile ~/.ssh/id_rsa
 
   Host lumi
       HostName lumi.csc.fi
@@ -74,6 +73,7 @@ This repository is carefully organized to cleanly separate the workflow orchestr
   > [!NOTE]
   > **CINECA Step CA Authentication**: If accessing Leonardo via CINECA OIDC SSO, activate your SSH agent session before running Snakemake:
   > ```bash
+  > ssh-keygen -f '~/.ssh/known_hosts' -R 'login.leonardo.cineca.it'
   > eval "$(ssh-agent -s)"
   > step ssh login 'your.email@cineca.it' --provisioner cineca-hpc
   > ```
