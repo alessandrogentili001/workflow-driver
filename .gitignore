@@ -1,8 +1,12 @@
 # Environment 
 venv/
-
-# Logs 
+# OpenFOAM generated results and logs 
 cavity/logs/
-
+cavity/processor*/
+cavity/log.*
+cavity/constant/polyMesh/
+cavity/[1-9]*/
+cavity/0.*/
+cavity/simulation_done.txt
 # Snakemake 
 .snakemake/

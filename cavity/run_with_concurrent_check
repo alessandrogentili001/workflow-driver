@@ -1,0 +1,22 @@
+#!/bin/bash
+set -x
+cd "${0%/*}" || exit
+
+# Remove old log to prevent OpenFOAM's 'already run' error
+rm -f log.icoFoam
+
+# Determine simulation cores from OpenFOAM config
+SIM_CORES=$(grep 'numberOfSubdomains' system/decomposeParDict | grep -o '[0-9]*' | head -n1)
+if [ -z "$SIM_CORES" ]; then SIM_CORES=8; fi
+
+export PYTHONUNBUFFERED=1
+
+# Launch simulation on SIM_CORES
+# Removed --exclusive to prevent SLURM step resource deadlocks (over memory/cores)
+srun -n $SIM_CORES --cpus-per-task 1 icoFoam -parallel > log.icoFoam 2>&1 &
+SIM_PID=$!
+
+# Launch checker directly on the batch node, passing the simulation PID
+python checker.py $SIM_PID
+
+wait $SIM_PID || true

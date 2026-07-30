@@ -30,7 +30,7 @@ def check_log(log_file, target_time, sim_pid, stop_event):
             stop_event.set()
             break
             
-        stop_event.wait(5.0)
+        stop_event.wait(120.0)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -38,7 +38,7 @@ if __name__ == "__main__":
         sys.exit(1)
         
     sim_pid = int(sys.argv[1])
-    log_file = "cavity/log.icoFoam"
+    log_file = "log.icoFoam"
     target_time = 0.003
     
     print(f"[Checker] Started checking {log_file} for target time {target_time}...")
