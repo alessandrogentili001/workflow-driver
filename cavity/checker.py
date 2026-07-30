@@ -30,7 +30,7 @@ def check_log(log_file, target_time, sim_pid, stop_event):
             stop_event.set()
             break
             
-        stop_event.wait(120.0)
+        stop_event.wait(20.0)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

@@ -2,6 +2,9 @@
 set -x
 cd "${0%/*}" || exit
 
+# Remove old time folders to ensure a fresh restart from 0
+rm -rf [1-9]* 0.*
+
 # Remove old log to prevent OpenFOAM's 'already run' error
 rm -f log.icoFoam
 
