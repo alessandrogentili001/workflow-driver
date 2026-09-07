@@ -2,8 +2,11 @@
 set -x
 cd "${0%/*}" || exit
 
-# Remove old log to prevent OpenFOAM's 'already run' error
-rm -f log.icoFoam
+# Remove old time folders to ensure a fresh restart from 0
+rm -rf [1-9]* 0.*
+
+# Remove old log and tensor to prevent OpenFOAM's 'already run' error
+rm -f log.icoFoam timesteps.npy
 
 # Determine simulation cores from OpenFOAM config
 SIM_CORES=$(grep 'numberOfSubdomains' system/decomposeParDict | grep -o '[0-9]*' | head -n1)
@@ -12,11 +15,13 @@ if [ -z "$SIM_CORES" ]; then SIM_CORES=8; fi
 export PYTHONUNBUFFERED=1
 
 # Launch simulation on SIM_CORES
-# Removed --exclusive to prevent SLURM step resource deadlocks (over memory/cores)
-srun -n $SIM_CORES --cpus-per-task 1 icoFoam -parallel > log.icoFoam 2>&1 &
+srun --overlap -n $SIM_CORES --cpus-per-task 1 icoFoam -parallel > log.icoFoam 2>&1 &
 SIM_PID=$!
 
-# Launch checker directly on the batch node, passing the simulation PID
-python checker.py $SIM_PID
+# Launch checker as a 1-core SLURM job step
+srun --overlap -n 1 --cpus-per-task 1 python checker.py $SIM_PID &
+CHECKER_PID=$!
 
 wait $SIM_PID || true
+wait $CHECKER_PID || true
+

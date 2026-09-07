@@ -29,6 +29,6 @@ run:
 	$(SNAKEMAKE) --profile $(PROFILE) --cores 1
 
 clean:
-	@rm -rf cavity/logs/* cavity/simulation_done.txt .snakemake/* efficiency_report* cavity/processor*
+	@rm -rf cavity/logs/* cavity/simulation_done.txt .snakemake/* efficiency_report* cavity/processor* cavity/*.npy
 	@bash cavity/clean
 	@foamDictionary cavity/system/controlDict -entry endTime -set 0.001

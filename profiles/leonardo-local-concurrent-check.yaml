@@ -1,0 +1,41 @@
+# Default Snakefile for this profile
+snakefile: workflow/cavity_workflow_concurrent_check.smk
+
+# Executor settings
+executor: slurm
+jobs: 1 # jobs to run in parallel, check the single job resources and compare them to the default ones (upper bound)
+
+# Default resources (The "Booster" Defaults)
+default-resources:
+  slurm_account: "phd_gentili_0"
+  slurm_partition: "dcgp_usr_prod"
+  runtime: 1440
+  nodes: 1
+  tasks: 9
+  ntasks_per_node: 9
+  cpus_per_task: 1
+  mem: "16G"
+  mpi: "srun"
+  # Standardized GPU request
+  #gpu: 4 # remove if you are not using them in any rule
+
+# Slurm Plugin Specific Settings
+slurm-pass-command-as-script: true
+
+# slurm log management
+#slurm-logdir: "cavity/logs/slurm" # all the outputs obtained from a slurm job are stored inside here
+slurm-keep-successful-logs: true
+
+slurm-init-seconds-before-status-checks: 10
+seconds-between-status-checks: 30
+slurm-status-attempts: 5
+
+slurm-jobname-prefix: "cavity_wf"
+# slurm-status-command: "squeue" # keep the default one
+
+# efficiency reporting
+slurm-efficiency-report: true
+
+config:
+  remote_workdir: "/leonardo_work/PHD_gentili/workflow-driver"
+  remote_host: "leonardo"

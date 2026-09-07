@@ -8,5 +8,9 @@ cavity/constant/polyMesh/
 cavity/[1-9]*/
 cavity/0.*/
 cavity/simulation_done.txt
+# Timesteps numpy tensor
+*.npy
 # Snakemake 
 .snakemake/
+# Python
+__pycache__/
