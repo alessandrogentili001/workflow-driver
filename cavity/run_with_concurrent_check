@@ -13,9 +13,10 @@ SIM_CORES=$(grep 'numberOfSubdomains' system/decomposeParDict | grep -o '[0-9]*'
 if [ -z "$SIM_CORES" ]; then SIM_CORES=8; fi
 
 export PYTHONUNBUFFERED=1
+export I_MPI_PMI_LIBRARY=/usr/lib64/libpmi2.so
 
-# Launch simulation on SIM_CORES
-srun --overlap -n $SIM_CORES --cpus-per-task 1 icoFoam -parallel > log.icoFoam 2>&1 &
+# Launch simulation on SIM_CORES (pmi2 interface for Intel MPI multi-node)
+srun --mpi=pmi2 --overlap -n $SIM_CORES --cpus-per-task 1 icoFoam -parallel > log.icoFoam 2>&1 &
 SIM_PID=$!
 
 # Launch checker as a 1-core SLURM job step
