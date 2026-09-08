@@ -28,7 +28,3 @@ default-storage-prefix: "sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_ge
 
 # Provide your exact HPC username profile details
 storage-sftp-username: "agentil1"
-
-config:
-  remote_workdir: "/leonardo_work/PHD_gentili/workflow-driver" 
-  remote_host: "leonardo"

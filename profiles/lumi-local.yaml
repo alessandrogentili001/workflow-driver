@@ -33,7 +33,3 @@ slurm-jobname-prefix: "cavity_wf"
 
 # efficiency reporting
 slurm-efficiency-report: true
-
-config:
-  remote_workdir: "/scratch/project_465002347/tommaso/workflow-driver"
-  remote_host: "lumi"

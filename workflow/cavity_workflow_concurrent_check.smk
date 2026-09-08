@@ -2,6 +2,13 @@
 ### LOAD ENVIRONMENT ###
 ########################
 
+import os
+
+# Get configuration from cluster_config.sh, environment, or default to current cluster directory
+config["remote_workdir"] = os.environ.get("REMOTE_WORKDIR")
+config["remote_host"] = os.environ.get("REMOTE_HOST")
+
+
 # Load the .env for all rules automatically
 shell.prefix("mkdir -p cavity/logs && [ -s .env ] && source .env >> cavity/logs/env_setup.log 2>&1 || true; ")
 

@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# Cluster Environment Configuration Template (scripts/cluster_config.sh.example)
+# ==============================================================================
+# Description:
+#   Centralizes all paths and environment variables required for remote cluster
+#   orchestration (via scripts/remote_submit.sh, remote_status.sh, remote_cancel.sh).
+#
+# Activation:
+#   Copy or symlink this file to scripts/cluster_config.sh:
+#     cp scripts/cluster_config.sh.my scripts/cluster_config.sh
+#
+# Consistency Check:
+#   - REMOTE_WORKDIR must match 'remote_workdir' and 'default-storage-prefix'
+#     in profiles/my-remote.yaml.
+#   - REMOTE_HOST must match 'remote_host' in profiles/my-remote.yaml and the
+#     Host alias configured in your ~/.ssh/config.
+#   - REMOTE_STORAGE_HOST must match the host:port in 'default-storage-prefix'
+#     in profiles/my-remote.yaml.
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Working Directories
+# ------------------------------------------------------------------------------
+# Local repository root (on WSL, Windows drives are under /mnt/c/..., /mnt/d/...)
+# Example WSL:   "/mnt/c/Users/<your_username>/Downloads/workflow-driver"
+# Example Linux: "/home/<your_username>/workflow-driver"
+export LOCAL_WORKDIR="<PATH_TO_LOCAL_WORKFLOW_DIR>"
+
+# Remote repository root on the HPC cluster filesystem (GPFS / Lustre / Scratch)
+# Example Leonardo: "/leonardo_work/<project>/workflow-driver"
+# Example LUMI:     "/scratch/<project>/<username>/workflow-driver"
+export REMOTE_WORKDIR="<PATH_TO_WORKFLOW_DIR_ON_HPC>"
+
+# ------------------------------------------------------------------------------
+# 2. Python Virtual Environments
+# ------------------------------------------------------------------------------
+# Local venv used by Snakemake orchestrator
+export LOCAL_VENV="${LOCAL_WORKDIR}/venv"
+
+# Remote venv on the HPC cluster used to execute wrapper scripts & Snakemake jobs
+export REMOTE_VENV="${REMOTE_WORKDIR}/venv"
+
+# ------------------------------------------------------------------------------
+# 3. Cache Directories (used for path virtualization in submitted jobscripts)
+# ------------------------------------------------------------------------------
+# Local cache path (e.g. "${HOME}/.cache" or "${LOCAL_WORKDIR}/.cache")
+export LOCAL_CACHE="${HOME}/.cache"
+
+# Remote cache path on the HPC cluster
+# Example: "/leonardo/home/userinternal/<username>/.cache" or "${REMOTE_WORKDIR}/.cache"
+export REMOTE_CACHE="<REMOTE_USER_HOME>/.cache"
+
+# ------------------------------------------------------------------------------
+# 4. HPC Network & SSH Identifiers
+# ------------------------------------------------------------------------------
+# SSH Host alias defined in your local ~/.ssh/config (must allow passwordless login)
+# Example: "leonardo", "lumi", or "my-cluster"
+export REMOTE_HOST="<HPC_HOST_ALIAS>"
+
+# SFTP login host and port used for storage transfers
+# Example Leonardo: "login.leonardo.cineca.it:22"
+# Example LUMI:     "lumi.csc.fi:22"
+export REMOTE_STORAGE_HOST="<REMOTE_STORAGE_HOST>:<PORT>"

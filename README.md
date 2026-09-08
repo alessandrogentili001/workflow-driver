@@ -3,21 +3,39 @@
 > *This project is carried out as part of the [SciFi-Turbo](https://scifiturbo.eu/) European project on behalf of CINECA as the HPC partner.*
 
 ## Scope of the Project
-The scope of this project is to develop a customizable workflow driver to manage complex Computational Fluid Dynamics (CFD) simulations automatically. It demonstrates how to robustly orchestrate these CFD tasks using Snakemake. The workflow is designed with a single dynamic Snakefile (acting as the driver) that seamlessly supports two execution modes:
-1. **Remote Orchestration**: The workflow manager runs ona a local Linux-based machine (or on the Windows Subsystem for Linux) and orchestrates jobs on a remote HPC cluster.
-2. **Local Execution**: The workflow manager runs directly on the HPC cluster's frontend node (or inside a dedicated slurm job).
+The scope of this project is to develop a customizable workflow driver to manage complex Computational Fluid Dynamics (CFD) simulations automatically. It demonstrates how to robustly orchestrate CFD tasks using Snakemake. The workflow is designed to seamlessly support two execution modes:
+1. **Remote Orchestration**: The workflow manager runs on a local Linux-based machine (or on the Windows Subsystem for Linux) and orchestrates jobs on a remote HPC cluster.
+2. **Local Execution**: The workflow manager runs directly on the HPC cluster's frontend node (or inside a dedicated Slurm job).
+
+Furthermore, the repository provides two workflow paradigms:
+- **Standard Checkpoint Workflow** (`workflow/cavity_workflow.smk`): Sequential simulation runs where parameter steering (`controlDict` update) occurs between successive simulation steps.
+- **Concurrent In-Flight Check Workflow** (`workflow/cavity_workflow_concurrent_check.smk`): In-flight monitoring where a Python checker runs concurrently alongside OpenFOAM inside the same Slurm job, records timesteps as a NumPy tensor on disk, and terminates the solver early once target conditions are met.
 
 ## Repository Structure
 
-This repository is carefully organized to cleanly separate the workflow orchestration logic, configuration profiles, helper scripts, and the actual simulation case data.
+This repository cleanly separates the workflow orchestration logic, configuration profiles, helper scripts, and simulation case data:
 
-- `workflow/`: Contains the single Snakemake workflow logic (i.e. `cavity_workflow.smk`) that adapts to your environment automatically.
-- `profiles/`: Configuration profiles for different cluster environments (`leonardo-remote.yaml` & `lumi-remote.yaml` for remote WSL orchestration; `leonardo-local.yaml` & `lumi-local.yaml` for local execution directly on the cluster).
-- `scripts/`: Helper bash scripts for cluster submission and status checking (required only for local orchestration), along with centralized configurations (`cluster_config.sh`) to virtualize paths between the local machine and the HPC cluster.
-- `cavity/`: The actual OpenFOAM case directory containing `0`, `constant`, and `system` configurations.
-- `.gitattributes`: Enforces Unix `LF` line endings across all shell scripts, Snakefiles, and config files across operating systems.
-- `makefile`: Provides convenient commands for running and cleaning the workflow.
-- `requirements.txt`: Specification containing all required dependencies.
+- `workflow/`: Contains Snakemake workflow definitions:
+  - `cavity_workflow.smk`: Standard reference pipeline with post-run checkpoint evaluation.
+  - `cavity_workflow_concurrent_check.smk`: Pipeline with concurrent in-flight monitoring and dynamic steering.
+- `profiles/`: Configuration profiles for different cluster environments and workflow types:
+  - `my-local.yaml` & `my-remote.yaml`: Generic, heavily commented templates to customize for any HPC cluster.
+  - `leonardo-local.yaml` & `leonardo-remote.yaml`: Profiles for standard execution on the CINECA Leonardo cluster.
+  - `leonardo-local-concurrent-check.yaml` & `leonardo-remote-concurrent-check.yaml`: Profiles for concurrent check execution on Leonardo.
+  - `lumi-local.yaml` & `lumi-remote.yaml`: Profiles for execution on the LUMI supercomputer.
+- `scripts/`: Centralized environment configurations and SSH remote submission wrappers:
+  - `cluster_config.sh.example`: Template centralizing working directories, virtual environments, and network hosts.
+  - `cluster_config.sh.leonardo` / `cluster_config.sh.lumi`: Pre-configured environment setups for specific clusters.
+  - `remote_submit.sh`, `remote_status.sh`, `remote_cancel.sh`: SSH-based wrapper scripts for remote Slurm orchestration.
+- `cavity/`: The OpenFOAM case directory:
+  - `0/`, `constant/`, `system/`: Case mesh, boundary, and solver definitions.
+  - `pre`, `dec`, `run`, `clean`: Shell scripts for `blockMesh`, `decomposePar`, `icoFoam`, and cleanup.
+  - `run_with_concurrent_check`: Wrapper executing `icoFoam` and `checker.py` concurrently using Slurm step resource sharing (`srun --overlap`).
+  - `checker.py`: Python daemon executing the 3-step pipeline (read log -> persist NumPy tensor on disk -> inspect & terminate).
+- `.env`: Environment variables and cluster modules (e.g., `module load openfoam+/2106`).
+- `.gitattributes`: Enforces Unix `LF` line endings across all shell scripts, Snakefiles, and config files.
+- `makefile`: Provides convenient commands for running, inspecting DAGs, and cleaning the workflow.
+- `requirements.txt`: Python dependencies required for workflow orchestration.
 
 ```text
 .
@@ -29,31 +47,44 @@ This repository is carefully organized to cleanly separate the workflow orchestr
 ├── cavity/
 │   ├── 0/
 │   ├── constant/
-│   └── system/
+│   ├── system/
+│   ├── pre
+│   ├── dec
+│   ├── run
+│   ├── run_with_concurrent_check
+│   ├── checker.py
+│   └── clean
 ├── profiles/
+│   ├── my-local.yaml
+│   ├── my-remote.yaml
 │   ├── leonardo-local.yaml
+│   ├── leonardo-local-concurrent-check.yaml
 │   ├── leonardo-remote.yaml
+│   ├── leonardo-remote-concurrent-check.yaml
 │   ├── lumi-local.yaml
 │   └── lumi-remote.yaml
 ├── scripts/
+│   ├── cluster_config.sh.example
+│   ├── cluster_config.sh.leonardo
+│   ├── cluster_config.sh.lumi
 │   ├── cluster_config.sh
 │   ├── remote_cancel.sh
 │   ├── remote_status.sh
 │   └── remote_submit.sh
 └── workflow/
-    └── cavity_workflow.smk
+    ├── cavity_workflow.smk
+    └── cavity_workflow_concurrent_check.smk
 ```
 
 ## Getting Started
 
 ### Prerequisites
-- You only need `make` and a `python` distribution (3.10+) with virtual environment support. All dependencies can be installed locally in a virtual environment.
-- Access to a HPC cluster (e.g. Leonardo) using the Slurm scheduler.
-- OpenFOAM available on the cluster.
-- A linux-based local machine or a Windows macine with the WSL enabled.
-- **Passwordless SSH**: If orchestrating locally, configure an SSH host alias (e.g., `leonardo` or `lumi`) in your `~/.ssh/config` on your local machine so that `ssh <remote_host>` connects without password prompts:
+- `make` and a `python` distribution (3.10+) with virtual environment support.
+- Access to an HPC cluster (e.g. Leonardo or LUMI) with the Slurm scheduler.
+- OpenFOAM installed and accessible via environment modules on the cluster.
+- A Linux-based machine or a Windows machine with WSL enabled.
+- **Passwordless SSH**: If orchestrating remotely, configure an SSH host alias in your `~/.ssh/config` on your local machine so that `ssh <remote_host>` connects without password prompts:
 
-  Here are examples of entries for the Leonardo and LUMI clusters to be added to `~/.ssh/config`:
   ```sshconfig
   Host leonardo
       HostName login.leonardo.cineca.it
@@ -65,12 +96,13 @@ This repository is carefully organized to cleanly separate the workflow orchestr
       IdentityFile ~/.ssh/id_rsa
   ```
 
-  Verify your connection by running:
+  Verify your connection (example for Leonardo) by running:
   ```bash
   ssh leonardo
   ```
 
-  > [!NOTE]
+  Warning:
+
   > **CINECA Step CA Authentication**: If accessing Leonardo via CINECA OIDC SSO, activate your SSH agent session before running Snakemake:
   > ```bash
   > ssh-keygen -f '~/.ssh/known_hosts' -R 'login.leonardo.cineca.it'
@@ -78,14 +110,14 @@ This repository is carefully organized to cleanly separate the workflow orchestr
   > step ssh login 'your.email@cineca.it' --provisioner cineca-hpc
   > ```
   > 
-  > **Paramiko SSH Certificate Patch**: When using Snakemake's SFTP plugin with SSH certificates (like those generated by `step ssh login`), you might encounter an `AttributeError: public_blob` crash. Patch `paramiko` directly inside your virtual environment:
+  > **Paramiko SSH Certificate Patch**: When using Snakemake's SFTP plugin with SSH certificates (like those generated by `step ssh login`), you might encounter an `AttributeError: public_blob` crash. Patch `paramiko` inside your virtual environment:
   > ```bash
   > python <<PY
   > import paramiko.agent
   > file_path = paramiko.agent.__file__
   > code = open(file_path).read()
-  > code = code.replace('def __getattr__(self, name):', \\
-  >     'def __getattr__(self, name):\\n        if name == \\'public_blob\\': return None')
+  > code = code.replace('def __getattr__(self, name):', \
+  >     'def __getattr__(self, name):\n        if name == \'public_blob\': return None')
   > open(file_path, 'w').write(code)
   > print('Patched paramiko successfully')
   > PY
@@ -93,102 +125,189 @@ This repository is carefully organized to cleanly separate the workflow orchestr
 
 ### Setup
 
-Repeat the following steps both for the local and HPC environments:
+Repeat the following steps for both the local machine and the HPC cluster:
 
-1. Clone the repository
+1. **Clone the repository**:
    ```bash
    git clone https://gitlab.hpc.cineca.it/agentil1/workflow-driver.git
    cd workflow-driver
    ```
-2. Create the virtual environment and install dependencies:
+2. **Create the virtual environment and install dependencies**:
    ```bash
-   python -m venv venv
+   python3 -m venv venv
    source venv/bin/activate
    pip install -r requirements.txt
    ```
-3. Update paths in `scripts/cluster_config.sh` to match your local paths and remote HPC directories.
-4. Review the `.env` file to ensure the correct OpenFOAM environment is set up are loaded on the cluster.
-5. Update the `yaml` file in the `profiles` folder with the HPC directories, remote host name and Slurm setup.
+3. **Configure cluster environment variables**:
+   Create your `scripts/cluster_config.sh` by copying the template or cluster preset:
+   ```bash
+   # For Leonardo
+   cp scripts/cluster_config.sh.leonardo scripts/cluster_config.sh
 
-## Architecture and Usage
+   # Or customize from template
+   cp scripts/cluster_config.sh.example scripts/cluster_config.sh
+   ```
+   Update the exported paths (`LOCAL_WORKDIR`, `REMOTE_WORKDIR`, `REMOTE_HOST`, etc.) to match your setup and run it inside the virtual environment:
+   ```bash
+   source scripts/cluster_config.sh
+   ```
+4. **Review and configure the cluster module environment (`.env`)**:
+   The `.env` file is automatically sourced by Snakemake on the HPC compute nodes before every rule executes (via `shell.prefix(...)` in the workflow). It ensures that all required compilers, MPI libraries, and CFD solvers are available in the job's execution shell.
 
-The workflow can be executed in two primary ways depending on where you run the orchestrator.
+   **Current Content of `.env`:**
+   ```bash
+   # Load engineering environment domain profile (on Leonardo)
+   module load profile/eng 
+
+   # Load OpenFOAM module
+   module load openfoam+/2106
+   ```
+
+5. **Review and customize execution profiles (`profiles/*.yaml`)**:
+   Snakemake profiles define default Slurm hardware resources, execution backends, and scheduler parameters, eliminating the need to type long command-line flags. 
+   
+   **Which Profile to Edit:**
+   - **Local execution on Leonardo**: Edit `profiles/leonardo-local.yaml` (or `profiles/leonardo-local-concurrent-check.yaml`).
+   - **Remote orchestration to Leonardo**: Edit `profiles/leonardo-remote.yaml` (or `profiles/leonardo-remote-concurrent-check.yaml`).
+   - **Other clusters (e.g. LUMI, MeluXina, local cluster)**: Copy and adapt the template files `profiles/my-local.yaml` and `profiles/my-remote.yaml`.
+
+   **Key Parameters to Customize:**
+
+   - **Target Workflow (`snakefile`)**:
+     ```yaml
+     snakefile: workflow/cavity_workflow.smk
+     # Or for in-flight concurrent monitoring:
+     # snakefile: workflow/cavity_workflow_concurrent_check.smk
+     ```
+   - **Slurm Account & Queue (`default-resources`)**:
+     ```yaml
+     default-resources:
+       slurm_account: "phd_gentili_0"       # MUST change to your active HPC project / account budget
+       slurm_partition: "dcgp_usr_prod"    # Slurm partition (e.g. "dcgp_usr_prod" on Leonardo, "standard" on LUMI)
+       runtime: 1440                       # Maximum walltime in minutes (1440 = 24 hours)
+     ```
+   - **Hardware & CPU Allocation**:
+     ```yaml
+       nodes: 1                            # Number of compute nodes per job
+       tasks: 8                            # Total MPI tasks (MUST match numberOfSubdomains in decomposeParDict)
+       ntasks_per_node: 8                  # MPI tasks per node
+       cpus_per_task: 1                    # CPU threads per task (increase for hybrid MPI+OpenMP)
+       mem: "16G"                          # Memory requested per node (e.g. "16G", "32G", "64G")
+       mpi: "srun"                         # Slurm MPI launcher
+       # gpu: 1                            # Uncomment and specify count if running on GPU partitions (e.g. Leonardo Booster)
+     ```
+
+     > Ensure that `tasks` matches the domain decomposition parameter `numberOfSubdomains` in your OpenFOAM case (`system/decomposeParDict`). For the concurrent check workflow, `tasks` is set to `9` (8 simulation cores + 1 monitoring core to allow the checker run on it).
+
+   - **Remote Orchestration Parameters (`profiles/*-remote.yaml` only)**:
+     ```yaml
+     default-storage-prefix: "sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/workflow-driver/"
+     storage-sftp-username: "<your-hpc-username>"  # e.g. "agentil1", "zanellit"
+     # storage-sftp-key-file: "/home/<user>/.ssh/id_rsa"  # Optional: path to private key if not in ssh-agent
+     ```
+     - `default-storage-prefix`: Format `sftp://<REMOTE_STORAGE_HOST>:<PORT>/<REMOTE_WORKDIR>/`. Points to the remote repository on the cluster filesystem where files are synced.
+     - `storage-sftp-username`: Your remote cluster username.
+
+---
+
+## Architecture and Execution
+
+The workflow can be executed either remotely (orchestrator on your machine) or locally (orchestrator directly on the cluster).
 
 ### 1. Remote Orchestration
 
-When orchestrating from your local machine, we employ a "Split-Brain" architecture:
-- **The Orchestrator** runs `snakemake`, builds the workflow's Directed Acyclic Graph (DAG), and manages job dependencies.
-- **The Compute Backend (Leonardo/LUMI)** receives jobs, executes the simulations, and stores data on the remote filesystem.
+In remote orchestration mode, a **Split-Brain** architecture is used:
+- **Local Machine**: Runs `snakemake`, evaluates the DAG, handles dynamic checkpoint logic, and tracks workflow state.
+- **Compute Backend (HPC)**: Executes the compute steps (`blockMesh`, `decomposePar`, `icoFoam`) via Slurm jobs.
 
-**How it works**:
-- **Storage Syncing**: `snakemake-storage-plugin-sftp` automatically pushes inputs and pulls outputs between the local machine and the remote HPC cluster filesystem.
-- **Job Submission**: The `cluster-generic` executor passes a generated jobscript to `scripts/remote_submit.sh`, which virtualizes paths and submits to Slurm via an SSH `sbatch` command.
-- **Log Synchronization**: Whenever a job finishes (successfully or failed), the `remote_status.sh` script automatically uses `scp` to pull the latest `cavity/logs/` directory back to your local machine.
-- **Dynamic Checkpoints**: The workflow loops based on simulation times. When evaluating remotely, the Python checkpoint function dynamically uses `ssh` to read the log remotely and execute `foamDictionary` directly on the cluster.
+**Mechanisms**:
+- **SFTP Storage Sync**: `snakemake-storage-plugin-sftp` pushes inputs and downloads results between local and remote filesystems.
+- **SSH Job Submission**: The `cluster-generic` executor delegates job submission to `scripts/remote_submit.sh`, which virtualizes paths and submits via SSH `sbatch`.
+- **Status & Log Retrieval**: `scripts/remote_status.sh` checks Slurm status via SSH and syncs `cavity/logs/` back to the local machine.
+- **Dynamic Checkpoints**: The checkpoint Python function evaluates logs remotely over SSH and runs `foamDictionary` to steer simulation parameters.
 
-**To Run on Leonardo**:
+**Running Standard Workflow Remotely**:
 ```bash
 snakemake --profile profiles/leonardo-remote.yaml --rerun-incomplete
 ```
-**To Run on LUMI**:
+
+**Running Concurrent Check Workflow Remotely**:
 ```bash
-snakemake --profile profiles/lumi-remote.yaml --rerun-incomplete
+snakemake --profile profiles/leonardo-remote-concurrent-check.yaml --rerun-incomplete
 ```
+
+---
 
 ### 2. Local Execution
 
-When running directly on the cluster login node (or on a dedicated slurm job), the architecture is much simpler since both the orchestrator and the compute backend share the exact same environment and filesystem.
+When running directly on the cluster login node (or inside an interactive Slurm session), both the orchestrator and the compute backend share the exact same environment and filesystem:
 
-**How it works**:
-- **No Path Virtualization**: The orchestrator and compute nodes share the same filesystem, bypassing the need for path mapping.
-- **Native Slurm Executor**: We use a native Slurm plugin rather than wrapping jobs in SSH commands.
-- **Dynamic Checkpoints**: The same checkpoint function automatically detects it is running locally on the shared filesystem and uses standard Python `open()` to read logs, bypassing SSH.
+**Mechanisms**:
+- **Native Slurm Executor**: Jobs are submitted directly to the Slurm queue using `snakemake-executor-plugin-slurm`.
+- **Zero Transfer Overhead**: No SFTP transfers or path virtualization are required.
+- **Direct Log Evaluation**: Checkpoints inspect log files and run `foamDictionary` natively on the cluster filesystem.
 
-**To Run on Leonardo**:
+**Running Standard Workflow on Leonardo**:
 ```bash
 snakemake --profile profiles/leonardo-local.yaml --rerun-incomplete
 ```
-**To Run on LUMI**:
+
+**Running Concurrent Check Workflow on Leonardo**:
 ```bash
-snakemake --profile profiles/lumi-local.yaml --rerun-incomplete
+snakemake --profile profiles/leonardo-local-concurrent-check.yaml --rerun-incomplete
 ```
+
+---
+
+## Concurrent Simulation Monitoring & Checkpointing
+
+The concurrent check workflow (`cavity_workflow_concurrent_check.smk`) demonstrates **concurrent monitoring and steering** of the ongoing CFD simulation. The idea is to run the CFD simulation in parallel with a checker script that monitors the simulation progress and steers it (e.g., by terminating it when a certain condition is met). This is particularly useful for long-running simulations or when you want to perform complex termination or restart conditions.
+
+1. **Slurm Step Overlap (`srun --overlap`)**:
+   In `cavity/run_with_concurrent_check`, both `icoFoam` (8 MPI tasks) and `checker.py` (1 task) run concurrently within a 9-core Slurm allocation. Passing `--overlap` prevents Slurm from exclusively locking memory/GRES to the first job step.
+
+2. **3-Step Tensor Monitoring Pipeline (`cavity/checker.py`)**:
+   - **Step 1 (Ingest):** Scans `log.icoFoam` for progress timestamps (`Time = ...`).
+   - **Step 2 (Persist):** Converts timestamps into a 1D NumPy tensor and writes it to disk as `cavity/timesteps.npy` via `np.save()`.
+   - **Step 3 (Inspect & Terminate):** Loads `timesteps.npy` via `np.load()`, verifies the latest timestep against `target_time`, and gracefully shuts down `icoFoam` using `os.kill(sim_pid, signal.SIGTERM)`.
+
+3. **Dynamic Feedback Loop**:
+   Snakemake's `check_simulation` function evaluates checkpoint outputs dynamically:
+   - If target time is satisfied, it completes the loop and triggers `finalize_simulation`.
+   - If not yet satisfied, it updates `controlDict` (`endTime`) using `foamDictionary` and launches the next iteration step ($i = 1, 2, 3 \dots$).
+
+---
 
 ## Useful Commands
 
-For common tasks, use the provided `makefile`:
+The provided `makefile` streamlines everyday tasks:
+
 ```bash
-# View available commands
+# View available make commands
 make help
 
-# Visualize the directed acyclic graph as a png image
+# Create or update virtual environment with dependencies
+make setup
+
+# Render the workflow DAG as an SVG image
 make dag
 
-# Run dry-run to preview the workflow steps (useful before submitting)
+# Dry-run the workflow to preview scheduled tasks
 make dry-run
 
-# Clean workflow generated files and logs (removes local logs and cavity output)
+# Run Snakemake directly using the configured profile
+make run
+
+# Clean generated outputs, logs, processor directories, and numpy tensors
 make clean
 ```
 
-## Understanding Snakemake and DAGs
-This project relies heavily on Snakemake to manage task dependencies via Directed Acyclic Graphs (DAGs). Snakemake determines what needs to be run by building a graph of inputs and outputs.
+---
 
-To understand how we create DAGs, define rules, and run workflows, please refer to the [official Snakemake repository](https://github.com/snakemake/snakemake) and its [official documentation](https://snakemake.readthedocs.io/). In particular, we suggest starting with the provided [tutorial](https://snakemake.readthedocs.io/en/stable/tutorial/basics.html).
+## Customizing for Your Own Simulations
 
-## The Reference Example (Cavity)
-
-The provided `workflow/cavity_workflow.smk` uses the classic OpenFOAM **cavity** simulation as a demonstration of how to structure a Snakemake pipeline. It is intended to be a **reference example**, rather than the rigid focus of the project.
-
-The example workflow demonstrates the following logic:
-1. **Mesh Preparation (`mesh_preparation`)**: Runs the `blockMesh` utility (via the `pre` script) to generate the mesh geometry.
-2. **Domain Decomposition (`decompose_mesh`)**: Runs `decomposePar` (via the `dec` script) to split the mesh into subdomains for parallel execution.
-3. **Simulation Loop (`run_simulation` & `check_simulation`)**: Executes the OpenFOAM solver (`icoFoam` via the `run` script) using a Snakemake **checkpoint**. The `check_simulation` Python function evaluates the simulation output (time step progress) and iteratively modifies the OpenFOAM dictionaries (`controlDict`) using `foamDictionary` to restart and advance the simulation until a target end time is reached.
-4. **Finalization (`finalize_simulation`)**: Creates a dummy output file (`simulation_done.txt`) to formally close the DAG and notify Snakemake that the overall workflow is complete.
-
-### Modifying the Workflow for Your Own Simulations
-
-Because the cavity simulation is just a placeholder, you are fully empowered to modify the workflow logic, profiles, and configs to fit your specific CFD tasks and HPC cluster setup:
-- **Swap the case directory**: Replace the `cavity/` folder with your own target simulation.
-- **Update the Snakefile**: Edit `workflow/cavity_workflow.smk` to rename paths, change bash commands, or adjust the looping conditions in the checkpoint function.
-- **Adjust Resources**: Modify the Snakemake rules to request different hardware (nodes, CPUs, GPUs, etc.) and update `profiles/generic.yaml` or `profiles/leonardo.yaml` as needed.
-- **Update Synchronization Paths**: If your case folder is named differently (e.g., `motorBike/`), ensure you update the hardcoded folder references in the bash helper scripts (`scripts/remote_submit.sh` and `scripts/remote_status.sh`), specifically regarding the `logs/` directory synchronization.
+To adapt this framework to your own CFD simulation or solver:
+- **Replace Case Data**: Swap the contents of `cavity/` with your OpenFOAM case (or another solver).
+- **Update Workflow Rules**: Modify `workflow/cavity_workflow.smk` or `workflow/cavity_workflow_concurrent_check.smk` to adjust preprocessing, solver commands, or checkpoint criteria.
+- **Adjust Resource Allocations**: Edit `default-resources` in the profile YAML files (`nodes`, `tasks`, `cpus_per_task`, `mem`, `runtime`, `gpu`).
+- **Update Folder Paths**: If renaming `cavity/`, update corresponding folder references in `scripts/remote_submit.sh`, `scripts/remote_status.sh`, and the `makefile`.

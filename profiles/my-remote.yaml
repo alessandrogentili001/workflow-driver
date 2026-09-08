@@ -1,0 +1,85 @@
+# ==============================================================================
+# Snakemake Profile: Remote Orchestration (profiles/my-remote.yaml)
+# ==============================================================================
+# Usage:
+#   snakemake --profile profiles/my-remote.yaml --rerun-incomplete
+#
+# Description:
+#   Use this profile when you run Snakemake from your local machine (e.g. WSL or Linux)
+#   and orchestrate simulations on a remote HPC cluster (e.g. Leonardo, LUMI).
+#
+# How it works:
+#   - Orchestration & DAG resolution runs locally via Snakemake.
+#   - Input/output sync is handled via the Snakemake SFTP storage plugin.
+#   - Job submission, status checks, and cancellation are delegated via SSH to
+#     scripts/remote_submit.sh, scripts/remote_status.sh, and scripts/remote_cancel.sh.
+#
+# Prerequisites:
+#   1. Passwordless SSH configured in ~/.ssh/config for <HPC_HOST_ALIAS>.
+#   2. scripts/cluster_config.sh paths updated to match your local and remote directories.
+#   3. Python virtual environments with requirements.txt set up on both machines.
+# ==============================================================================
+
+# Default workflow entry point
+snakefile: workflow/<YOUR_WORKFLOW_NAME>.smk
+
+# ------------------------------------------------------------------------------
+# Executor Settings (Cluster-Generic via SSH wrappers)
+# ------------------------------------------------------------------------------
+executor: cluster-generic
+jobs: 1                                       # Max parallel jobs to submit to the remote cluster
+latency-wait: 60                              # Seconds to wait for remote files to synchronize
+shared-fs-usage: none                         # Must be 'none' (local machine & cluster do not share storage)
+
+# ------------------------------------------------------------------------------
+# Default Slurm Resources for Remote Jobs
+# ------------------------------------------------------------------------------
+# These resources are parsed by scripts/remote_submit.sh and passed dynamically to sbatch
+default-resources:
+  # SLURM Accounting & Partition (REQUIRED: Change to your HPC project / queue)
+  slurm_account: "<YOUR_SLURM_ACCOUNT>"        # e.g. "phd_gentili_0" (Leonardo), "project_465002347" (LUMI)
+  slurm_partition: "<YOUR_SLURM_PARTITION>"    # e.g. "dcgp_usr_prod", "standard", "small", "batch"
+
+  # Job walltime in minutes (1440 = 24 hours)
+  runtime: 1440
+
+  # Hardware Allocation
+  ntasks_per_node: 8                          # Tasks (MPI processes) per node
+  cpus_per_task: 1                            # OpenMP / CPU threads per task
+  mem: "16G"                                  # Memory per node (e.g. "16G", "32G")
+
+# ------------------------------------------------------------------------------
+# Remote Wrapper Scripts
+# ------------------------------------------------------------------------------
+# Local helper scripts that manage SSH connections, path virtualization, and Slurm sbatch
+cluster-generic-submit-cmd: "scripts/remote_submit.sh" # Virtualizes paths & submits job via SSH sbatch
+cluster-generic-status-cmd: "scripts/remote_status.sh" # Polls squeue/sacct via SSH & syncs logs back
+cluster-generic-cancel-cmd: "scripts/remote_cancel.sh" # Cancels remote job on interrupt (scancel)
+
+# ------------------------------------------------------------------------------
+# Remote Storage Provider (SFTP Synchronization)
+# ------------------------------------------------------------------------------
+default-storage-provider: sftp
+
+# Storage prefix: points to the remote cluster login node and repo directory.
+# Format: "sftp://<REMOTE_STORAGE_HOST>:<PORT>/<PATH_TO_WORKFLOW_DIR_ON_HPC>/"
+# Example: "sftp://login.leonardo.cineca.it:22/leonardo_work/PHD_gentili/workflow-driver/"
+default-storage-prefix: "sftp://<REMOTE_STORAGE_HOST>:<PORT>/<PATH_TO_WORKFLOW_DIR_ON_HPC>/"
+
+# HPC username used to authenticate the SFTP connection
+storage-sftp-username: "<YOUR_HPC_USERNAME>"  # e.g. "agentil1", "zanellit"
+
+# SSH Private Key for SFTP (Optional):
+# Paramiko (used by the SFTP plugin) might not read ~/.ssh/config aliases.
+# If using a specific key file (not loaded in ssh-agent), uncomment and provide the absolute path:
+# storage-sftp-key-file: "/home/<username>/.ssh/id_rsa"
+
+# ------------------------------------------------------------------------------
+# Workflow Configuration (Automatically loaded from scripts/cluster_config.sh)
+# ------------------------------------------------------------------------------
+# 'remote_workdir' and 'remote_host' are automatically inferred from
+# scripts/cluster_config.sh by workflow/cavity_workflow.smk. You do NOT need
+# to duplicate them here. Uncomment only if you need an explicit override:
+# config:
+#   remote_workdir: "<PATH_TO_WORKFLOW_DIR_ON_HPC>"
+#   remote_host: "<HPC_HOST_ALIAS>"

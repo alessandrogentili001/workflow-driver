@@ -12,5 +12,6 @@ cavity/simulation_done.txt
 *.npy
 # Snakemake 
 .snakemake/
+efficiency_report_*.csv
 # Python
 __pycache__/

@@ -35,7 +35,3 @@ slurm-jobname-prefix: "cavity_wf"
 
 # efficiency reporting
 slurm-efficiency-report: true
-
-config:
-  remote_workdir: "/leonardo_work/PHD_gentili/workflow-driver"
-  remote_host: "leonardo"

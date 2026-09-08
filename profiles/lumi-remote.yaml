@@ -31,7 +31,3 @@ storage-sftp-username: "zanellit"
 
 # Paramiko does not read ~/.ssh/config, so point it directly at the LUMI key
 storage-sftp-key-file: "/home/tommaso/.ssh/id_ed25519_lumi_2"
-
-config:
-  remote_workdir: "/scratch/project_465002347/tommaso/workflow-driver"
-  remote_host: "lumi"

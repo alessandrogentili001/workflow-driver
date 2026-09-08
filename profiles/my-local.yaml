@@ -1,0 +1,73 @@
+# ==============================================================================
+# Snakemake Profile: Local HPC Execution (profiles/my-local.yaml)
+# ==============================================================================
+# Usage:
+#   snakemake --profile profiles/my-local.yaml --rerun-incomplete
+#
+# Description:
+#   Use this profile when you run Snakemake DIRECTLY on the HPC cluster
+#   (on the login node or inside an interactive/batch Slurm allocation).
+#   Jobs are submitted natively to Slurm using the Snakemake Slurm executor plugin.
+#
+# Documentation:
+#   https://snakemake.github.io/snakemake-plugin-catalog/plugins/executor/slurm.html
+# ==============================================================================
+
+# Default workflow entry point
+snakefile: workflow/<YOUR_WORKFLOW_NAME>.smk
+
+# ------------------------------------------------------------------------------
+# Executor Configuration
+# ------------------------------------------------------------------------------
+executor: slurm
+jobs: 1 # Maximum number of concurrent Slurm jobs to keep active
+
+# ------------------------------------------------------------------------------
+# Default Slurm Resources
+# ------------------------------------------------------------------------------
+# These defaults apply to all workflow rules unless overridden in the rule definition.
+default-resources:
+  # SLURM Accounting & Partition (REQUIRED: Change to your HPC project / queue)
+  slurm_account: "<YOUR_SLURM_ACCOUNT>"       # e.g. "phd_gentili_0" (Leonardo), "project_465002347" (LUMI)
+  slurm_partition: "<YOUR_SLURM_PARTITION>"   # e.g. "dcgp_usr_prod", "standard", "small", "batch"
+
+  # Job walltime in minutes (1440 = 24 hours)
+  runtime: 1440
+
+  # Hardware Allocation
+  nodes: 1                                   # Number of compute nodes per job
+  tasks: 8                                   # Total MPI tasks / processes
+  ntasks_per_node: 8                         # MPI tasks assigned per node
+  cpus_per_task: 1                           # OpenMP / CPU threads per task
+  mem: "16G"                                 # RAM per node (e.g. "16G", "32G")
+  mpi: "srun"                                # MPI launcher ("srun" for Slurm native MPI)
+
+  # GPU Allocation (Optional: uncomment if your rules require GPUs)
+  # gpu: 1                                   # Number of GPUs per job (e.g. 1, 2, 4)
+
+# ------------------------------------------------------------------------------
+# Slurm Executor Plugin Options
+# ------------------------------------------------------------------------------
+slurm-pass-command-as-script: true           # Wrap commands into an sbatch script file
+slurm-keep-successful-logs: true             # Preserve Slurm logs for completed jobs
+
+# Status polling intervals & resilience
+slurm-init-seconds-before-status-checks: 10  # Delay before first checking job status
+seconds-between-status-checks: 30            # Polling interval in seconds
+slurm-status-attempts: 5                     # Retries if Slurm CLI (squeue/sacct) query fails
+
+# Job naming & logging
+slurm-jobname-prefix: "<YOUR_JOB_NAME>"      # Prefix displayed in `squeue -u $USER`
+# slurm-logdir: "cavity/logs/slurm"          # Optional: custom directory for Slurm stdout/stderr logs
+
+# Performance & efficiency summary in Snakemake logs
+slurm-efficiency-report: true
+
+# ------------------------------------------------------------------------------
+# Workflow Configuration (Automatically resolved)
+# ------------------------------------------------------------------------------
+# When running locally on the cluster, workflow/cavity_workflow.smk automatically
+# uses the current repository directory. You do NOT need to define remote_workdir
+# or remote_host here. Uncomment below only if you need an explicit override:
+# config:
+#   remote_workdir: "<PATH_TO_WORKFLOW_DIR_ON_HPC>"
